@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/basic.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>Board List</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Board List</h5>
+
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th class="col">Bno</th>
+                            <th class="col">Title</th>
+                            <th class="col">Writer</th>
+                            <th class="col">RegDate</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr th:each="dto:${pageResponseDTO.dtoList}">
+                            <td>[[${dto.bno}]]</td>
+                            <td>[[${dto.title}]]</td>
+                            <td>[[${dto.writer}]]</td>
+                            <td>[[${#strings.substring(dto.regDate, 0, 10)}]]</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script layout:fragment="script" th:inline="javascript">
+    console.log("test")
+</script>
+</body>
+</html>

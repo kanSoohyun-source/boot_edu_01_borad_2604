@@ -1,6 +1,7 @@
 package boot_edu_01_board_2603.repository;
 
 import boot_edu_01_board_2603.domain.Board;
+import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,43 @@ class BoardRepositoryTest {
     }
 
     @Test
+    @Transactional
+    public void testSelect2() {
+        /*
+        getReferenceById()
+        1) 특정한 번호의 게시물을 조회하는 기능
+        2) 반환 타입은 Optional<T>가 아니라 T
+        3) 지연 조회 : 호출 시 DB에 쿼리를 날리는 것이 아니라 사용 시점에 쿼리를 날림
+         */
+        Long bno = 10L;
+        Board board = boardRepository.getReferenceById(bno);
+        // 사용 시점에서 쿼리를 날리는 경우 엔티티 매니저가 닫혀서 LazyInitializationException 발생
+        log.info("------------"); // 쿼리 날리는 지점 확인 위한 의미 없는 출력
+        log.info(board); // ** 여기가 쿼리 날리는 지점 **
+        // 해결 방안 : @Transactional 사용해 메서드가 끝날때까지 DB 연결되어 있게 할 것
+    }
+
+    @Test
+    public void testSear1() {
+        String keyword = "6";
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").descending());
+        Page<Board> result = boardRepository.findByContentContaining(keyword, pageable);
+        for (Board board : result.getContent()) {
+            log.info(board);
+        }
+    }
+
+    @Test
+    public void testSear2() {
+        String keyword = "6";
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").descending());
+        Page<Board> result = boardRepository.findContent(keyword, pageable);
+        for (Board board : result.getContent()) {
+            log.info(board);
+        }
+    }
+
+    @Test
     public void testUpdate() {
         /*
         title, content만 수정 대상
@@ -91,6 +129,32 @@ class BoardRepositoryTest {
         // 1 page 10 posts, order by bno desc
         Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").descending());
         Page<Board> result = boardRepository.findAll(pageable);
+
+        for (Board board : result.getContent()) {
+            log.info(board);
+        }
+
+        log.info("total count: {}", result.getTotalElements()); // 전체 데이터 개수
+        log.info("total pages: {}", result.getTotalPages()); // 전체 페이지 수
+        log.info("page number: {}", result.getNumber());
+        log.info("page size: {}", result.getSize());
+
+        log.info(result.hasNext());
+        log.info(result.hasPrevious());
+    }
+
+    @Test
+    public void testQuerydsl1() {
+        Pageable pageable = PageRequest.of(0, 10);
+        boardRepository.search1(pageable);
+    }
+
+    @Test
+    public void testSearchAll() {
+        String[] types = {"c"};
+        String keyword = "5";
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Board> result = boardRepository.searchAll(types, keyword, pageable);
 
         for (Board board : result.getContent()) {
             log.info(board);
